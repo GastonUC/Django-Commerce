@@ -16,7 +16,7 @@ class AuctionListing(models.Model):
     title = models.CharField(max_length=45) #or 50
     description = models.CharField(max_length=250)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="category")
-    price = models.DecimalField(max_digits=9, decimal_places=2)
+    price = models.FloatField(max_digits=9, decimal_places=2)
     date = models.DateField(auto_now=True)
     img_url = models.URLField(blank=True) # Check
     state = models.BooleanField(default=False)
