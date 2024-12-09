@@ -114,10 +114,17 @@ def new_listing(request):
                 title = title,
                 description = description,
                 category = category,
-                price = price,
+                # price = price,
                 img_url = img_url
             )
             auction.save()
+
+            bid = Bid(
+               auction = AuctionListing.objects.get(pk=request.auction.id),
+               amount = price,
+               user = User.objects.get(pk=request.user.id)
+            )
+            bid.save()
 
             return HttpResponseRedirect(reverse("index"))
         else:
