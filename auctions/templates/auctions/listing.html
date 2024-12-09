@@ -18,7 +18,8 @@
         {% if user == auction.user %}
             <input type="submit" value="Close Auction">
         {% endif %}
-        <input type="number" name="bid" placeholder="Bid for the item">
+        <!-- <input type="number" name="bid" placeholder="Bid for the item"> -->
+        {{ Bid }}
         <input type="submit" value="Bid"><br>
         {% if not watchlist %}
         <button>Add to Watchlist</button>
