@@ -13,11 +13,11 @@ class CreateListing(forms.Form):
     title = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Title for the Listing'}))
     description = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Description'})) # initial="Title for the Listing"
     # category = forms.Select()
-    bid = forms.DecimalField(max_value=1000000, decimal_places=2, initial=0)
+    # bid = forms.DecimalField(max_value=1000000, decimal_places=2, initial=0)
     img_url = forms.URLField(widget=forms.URLInput(attrs={'placeholder': 'https://www.imgur.com'}))
 
 class CreateBid(forms.Form):
-    bid = forms.IntegerField(max_value=100000, initial=0)
+    bid = forms.FloatField(max_value=100000,decimal_places=2, initial=0)
 
 def index(request):
     # auctions = AuctionListing.objects.all()
@@ -91,7 +91,8 @@ def auction(request, auction_id):
             auction.price.save()
 
     return render(request, "auctions/listing.html", {
-        "auction": auction
+        "auction": auction,
+        "bid": CreateBid()
     })
 
 
@@ -99,11 +100,13 @@ def auction(request, auction_id):
 def new_listing(request):
     if request.method == "POST":
         form = CreateListing(request.POST)
-        if form.is_valid():
+        bidForm = CreateBid(request.POST)
+        if form.is_valid() && bidForm.is_valid():
             title = form.cleaned_data["title"]
             description = form.cleaned_data["description"]
             category = Category.objects.get(pk=int(request.POST["category"]))
-            price = form.cleaned_data["bid"]
+            # price = form.cleaned_data["bid"]
+            price = bidForm.cleaned_data["bid"]
             img_url = form.cleaned_data["img_url"]
 
             auction = AuctionListing(
@@ -124,6 +127,7 @@ def new_listing(request):
     else:
         return render(request, "auctions/create_listing.html", {
             "form": CreateListing(),
+            "bidForm": CreateBid(),
             "categories": Category.objects.all()
         })
 
