@@ -17,15 +17,16 @@
     {% if user.is_authenticated %}
         {% if user == auction.user %}
             <input type="submit" value="Close Auction">
+        {% else %}
+            {{ bid.bid }}
+            <input type="submit" value="Bid"><br>
+            {% if not watchlist %}
+            <button>Add to Watchlist</button>
+            {% else %}
+            <button>Remove from watchlist</button>
+            {% endif %}
         {% endif %}
         <!-- <input type="number" name="bid" placeholder="Bid for the item"> -->
-        {{ bid }}
-        <input type="submit" value="Bid"><br>
-        {% if not watchlist %}
-        <button>Add to Watchlist</button>
-        {% else %}
-        <button>Remove from watchlist</button>
-        {% endif %}
     {% endif %}
 
 </section>

@@ -13,8 +13,7 @@ Here is where you can create Listings <br>
             </option>
         {% endfor %}
     </select> <br>
-    {{ form.bid }} <br>
-    {{ bid }}
+    {{ bid.bid }} <br> <!-- added '.bid' because in this way, the label disappears-->
     {{ form.img_url }} <br>
     <input type="submit" value="Create Listing">
 </form>

@@ -3,19 +3,19 @@ from django.contrib.auth import get_user_model
 from .models import AuctionListing, Bid, Comment, Category, Watchlist
 
 class AuctionListingAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "description", "category", "price", "date", "img_url", "user")
+    list_display = ("id", "title", "description", "category", "price", "date", "img_url", "user", "state")
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ("id", "name")
 
 class BidAdmin(admin.ModelAdmin):
-    list_display = ("id", "amount")
+    list_display = ("id", "auction", "amount", "user", "bid_date")
 
 class WatchlistAdmin(admin.ModelAdmin):
     list_display = ("auction", "user")
 
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ("id", "body")
+    list_display = ("id", "body", "user", "date")
 
 # Register your models here.
 admin.site.register(AuctionListing, AuctionListingAdmin)

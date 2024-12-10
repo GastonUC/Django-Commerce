@@ -17,7 +17,7 @@ class CreateListing(forms.Form):
     img_url = forms.URLField(widget=forms.URLInput(attrs={'placeholder': 'https://www.imgur.com'}))
 
 class CreateBid(forms.Form):
-    bid = forms.FloatField(max_value=100000,decimal_places=2, initial=0)
+    bid = forms.DecimalField(max_value=1000000, decimal_places=2, initial=0)
 
 def index(request):
     # auctions = AuctionListing.objects.all()
@@ -85,7 +85,7 @@ def auction(request, auction_id):
         user_bid = CreateBid(request.POST)
         actual_bid = auction.price
         if user_bid <= actual_bid:
-            print("message")
+            print("Bid must be above the price on the item")
             #Throw a message for the user "Bid must be above the price on the item"
         else:
             auction.price.save()
@@ -101,7 +101,7 @@ def new_listing(request):
     if request.method == "POST":
         form = CreateListing(request.POST)
         bidForm = CreateBid(request.POST)
-        if form.is_valid() && bidForm.is_valid():
+        if form.is_valid() and bidForm.is_valid():
             title = form.cleaned_data["title"]
             description = form.cleaned_data["description"]
             category = Category.objects.get(pk=int(request.POST["category"]))
@@ -134,7 +134,7 @@ def new_listing(request):
     else:
         return render(request, "auctions/create_listing.html", {
             "form": CreateListing(),
-            "bidForm": CreateBid(),
+            "bid": CreateBid(),
             "categories": Category.objects.all()
         })
 

@@ -6,7 +6,7 @@ class User(AbstractUser):
     pass
 
 class Category(models.Model): # Optional for the user
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=20, blank=True)
 
     def __str__(self):
         return self.name
@@ -16,8 +16,8 @@ class AuctionListing(models.Model):
     title = models.CharField(max_length=45) #or 50
     description = models.CharField(max_length=250)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="category")
-    price = models.FloatField(max_digits=9, decimal_places=2)
-    date = models.DateField(auto_now=True)
+    price = models.DecimalField(max_digits=9, decimal_places=2)
+    date = models.DateTimeField(auto_now_add=True)
     img_url = models.URLField(blank=True) # Check
     state = models.BooleanField(default=False)
 
@@ -26,20 +26,21 @@ class AuctionListing(models.Model):
 
 class Bid(models.Model):
     auction = models.ForeignKey(AuctionListing, on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=9, decimal_places=2) #or Intege r
-    user = models.ForeignKey(User, on_delete=models.CASCADE) # FIX
-    bid_date = models.DateField(auto_now=True)
+    amount = models.DecimalField(max_digits=9, decimal_places=2)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    bid_date = models.DateTimeField(auto_now_add=True) #because shouldn't change
 
     def __str__(self):
-        return self.amount
+        return f"{self.user} bid {self.amount} on {self.auction}"
 
 class Comment(models.Model):
     auction = models.ForeignKey(AuctionListing, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     body = models.CharField(max_length=250)
-    # user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="username") # FIX doesn't need related_name it seems
+    date = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return self.body
+        return f"Comment: {self.body} on auction {self.auction} created by {self.user}"
 
 class Watchlist(models.Model):
     auction = models.ForeignKey(AuctionListing, on_delete=models.CASCADE)
