@@ -15,7 +15,7 @@ class WatchlistAdmin(admin.ModelAdmin):
     list_display = ("auction", "user")
 
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ("id", "body", "user", "date")
+    list_display = ("id", "auction", "body", "user", "date")
 
 # Register your models here.
 admin.site.register(AuctionListing, AuctionListingAdmin)
