@@ -18,27 +18,27 @@
         </div>
         <ul class="nav">
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
+                <a class="nav-link" href="{% url 'index' %}" tabindex="-1">Active Listings</a>
             </li>
             <li class="nav">
-                <a class="nav-link" href="{% url 'categories' %}">Categories</a>
+                <a class="nav-link" href="{% url 'categories' %}" tabindex="-1">Categories</a>
             </li>
             {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'watchlist' %}">Watchlist</a>
+                    <a class="nav-link" href="{% url 'watchlist' %}" tabindex="-1">Watchlist</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'new_listing' %}">Create Listing</a>
+                    <a class="nav-link" href="{% url 'new_listing' %}" tabindex="-1">Create Listing</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+                    <a class="nav-link" href="{% url 'logout' %}" tabindex="-1">Log Out</a>
                 </li>
             {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                    <a class="nav-link" href="{% url 'login' %}" tabindex="-1">Log In</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    <a class="nav-link" href="{% url 'register' %}" tabindex="-1">Register</a>
                 </li>
             {% endif %}
         </ul>

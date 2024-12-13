@@ -1,10 +1,12 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django import forms
+from django.core.exceptions import ValidationError
 
 from .models import User, Category, AuctionListing, Watchlist, Bid
 
@@ -17,7 +19,7 @@ class CreateListing(forms.Form):
     img_url = forms.URLField(widget=forms.URLInput(attrs={'placeholder': 'https://www.imgur.com'}))
 
 class CreateBid(forms.Form):
-    bid = forms.DecimalField(max_value=1000000, decimal_places=2, initial=0)
+    bid = forms.DecimalField(max_value=1000000, decimal_places=2, initial=0, widget=forms.NumberInput(attrs={'placeholder':'Place your bid', 'tabindex':'0'}))
 
 def index(request):
     # auctions = AuctionListing.objects.all()
@@ -82,13 +84,27 @@ def register(request):
 def auction(request, auction_id):
     auction = AuctionListing.objects.get(id=auction_id)
     if request.method == "POST":
-        user_bid = CreateBid(request.POST)
-        actual_bid = auction.price
-        if user_bid <= actual_bid:
-            print("Bid must be above the price on the item")
-            #Throw a message for the user "Bid must be above the price on the item"
-        else:
-            auction.price.save()
+        form = CreateBid(request.POST)
+        if form.is_valid():
+            user_bid = float(form.cleaned_data["bid"])
+            actual_bid = auction.price
+            if user_bid <= actual_bid:
+                messages.error(request, "Sorry, but your bid must be above the present one")
+                # raise ValidationError("Sorry, but your bid must be above the present one") # This will only display the validationError mesasge at the top of the page when Developer mode is active
+                # return HttpResponseRedirect(reverse("auction", args=(auction_id,)))
+            else:
+                bid = Bid(
+                    auction = auction,
+                    amount = user_bid,
+                    user = User.objects.get(pk=request.user.id)
+                )
+                bid.save()
+
+                # Update the auctions's price
+                auction.price = bid.amount
+                auction.save()
+                print("Bid saved")
+                # auction.price.save()
 
     return render(request, "auctions/listing.html", {
         "auction": auction,
@@ -108,23 +124,24 @@ def new_listing(request):
             # price = form.cleaned_data["bid"]
             price = bidForm.cleaned_data["bid"]
             img_url = form.cleaned_data["img_url"]
+            user = User.objects.get(pk=request.user.id)
 
             auction = AuctionListing(
-                user = User.objects.get(pk=request.user.id),
+                user = user,
                 title = title,
+                price = price,
                 description = description,
                 category = category,
-                # price = price,
                 img_url = img_url
             )
             auction.save()
 
-            bid = Bid(
-               auction = AuctionListing.objects.get(pk=request.auction.id),
-               amount = price,
-               user = User.objects.get(pk=request.user.id)
-            )
-            bid.save()
+            # bid = Bid(
+            #    auction = auction,
+            #    amount = price,
+            #    user = user
+            # )
+            # bid.save()
 
             return HttpResponseRedirect(reverse("index"))
         else:
@@ -142,7 +159,20 @@ def new_listing(request):
 @login_required(login_url="login")
 def watchlist(request):
     user_id = User.objects.get(pk=request.user.id)
-    watchlist = Watchlist.objects.filter(user=user_id)
+    # watchlist = Watchlist.objects.filter(user=user_id)
+
+    if request.method == "POST":
+        auction_id = request.POST["auction_id"]
+        auction = AuctionListing.objects.get(pk=auction_id)
+        watchlist = Watchlist(
+            auction = auction,
+            user = user_id
+        )
+        watchlist.save()
+        
+        messages.SUCCESS(request, "Auction added to Watchlist Successfully!")
+        # return HttpResponseRedirect(reverse("watchlist"))
+
     return render(request, "auctions/watchlist.html", {
         "watchlist": watchlist
     })

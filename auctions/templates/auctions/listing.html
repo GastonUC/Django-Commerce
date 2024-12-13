@@ -3,6 +3,13 @@
 
 <section>
     <h2>{{ auction.title }}</h2>
+    {% if messages %}
+    <div>
+        {% for message in messages %}
+            {{ message }} <!-- Add a custom error message -->
+        {% endfor %}
+    </div>
+    {% endif %}
     <article>
         <img src="{{ auction.img_url }}" alt="Image of the listing" height="250px" width="500px">
     </article>
@@ -18,6 +25,8 @@
         {% if user == auction.user %}
             <input type="submit" value="Close Auction">
         {% else %}
+        <form action="{% url 'auction' auction.id %}" method="post">
+            {% csrf_token %}
             {{ bid.bid }}
             <input type="submit" value="Bid"><br>
             {% if not watchlist %}
@@ -25,6 +34,7 @@
             {% else %}
             <button>Remove from watchlist</button>
             {% endif %}
+        </form>
         {% endif %}
         <!-- <input type="number" name="bid" placeholder="Bid for the item"> -->
     {% endif %}
