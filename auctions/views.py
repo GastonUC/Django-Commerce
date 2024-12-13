@@ -8,7 +8,7 @@ from django.urls import reverse
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .models import User, Category, AuctionListing, Watchlist, Bid
+from .models import User, Category, AuctionListing, Watchlist, Bid, Comment
 
 
 class CreateListing(forms.Form):
@@ -20,6 +20,9 @@ class CreateListing(forms.Form):
 
 class CreateBid(forms.Form):
     bid = forms.DecimalField(max_value=1000000, decimal_places=2, initial=0, widget=forms.NumberInput(attrs={'placeholder':'Place your bid', 'tabindex':'0'}))
+
+class CreateComment(forms.Form):
+    body = forms.CharField(label="", max_length=250, widget=forms.Textarea(attrs={'placeholder':'Enter your comment...'}))
 
 def index(request):
     # auctions = AuctionListing.objects.all()
@@ -82,7 +85,36 @@ def register(request):
 
 
 def auction(request, auction_id):
-    auction = AuctionListing.objects.get(id=auction_id)
+    try:
+        auction = AuctionListing.objects.get(id=auction_id)
+    except AuctionListing.DoesNotExist:
+        return HttpResponse("Auction not found") # Fix for 404 error page
+
+    bid_count = Bid.objects.filter(auction=auction_id).count()
+    highest_bid = Bid.objects.filter(auction=auction_id).order_by("-amount").first()
+    # print(bid_count, highest_bid)
+
+    if auction.state:
+        if bid_count < 1:
+            messages.error(request, "This auction has ended without any bids")
+        else:
+            messages.success(request, f"This auction has ended with a winning bid of {highest_bid}")
+            watchlist = False
+    else:
+        if request.user.is_authenticated:
+            watchlist_item = Watchlist.objects.filter(user=request.user.id, auction=auction)
+            watchlist = watchlist_item.exists()
+        else:
+            watchlist = False
+
+    comments = Comment.objects.filter(auction=auction_id)
+
+    if highest_bid is not None:
+        if highest_bid.user == request.user.id:
+            messages.success(request, "You have the highest bid on this auction")
+        else:
+            messages.info(request, f"The highest bid on this auction is from {highest_bid.user}")
+
     if request.method == "POST":
         form = CreateBid(request.POST)
         if form.is_valid():
@@ -108,7 +140,10 @@ def auction(request, auction_id):
 
     return render(request, "auctions/listing.html", {
         "auction": auction,
-        "bid": CreateBid()
+        "bid": CreateBid(),
+        "watchlist": watchlist,
+        "comments": comments,
+        "comment_form": CreateComment()
     })
 
 
@@ -136,13 +171,7 @@ def new_listing(request):
             )
             auction.save()
 
-            # bid = Bid(
-            #    auction = auction,
-            #    amount = price,
-            #    user = user
-            # )
-            # bid.save()
-
+            messages.success(request, "Auction created successfully!")
             return HttpResponseRedirect(reverse("index"))
         else:
             return render(request, "auctions/create_listing.html", {
@@ -158,21 +187,33 @@ def new_listing(request):
 
 @login_required(login_url="login")
 def watchlist(request):
-    user_id = User.objects.get(pk=request.user.id)
-    # watchlist = Watchlist.objects.filter(user=user_id)
+    try:
+        user_id = User.objects.get(pk=request.user.id)
+    except User.DoesNotExist:
+        messages.error(request, "User not found.")
+        return HttpResponseRedirect(reverse("index"))
 
     if request.method == "POST":
         auction_id = request.POST["auction_id"]
-        auction = AuctionListing.objects.get(pk=auction_id)
-        watchlist = Watchlist(
-            auction = auction,
-            user = user_id
-        )
-        watchlist.save()
-        
-        messages.SUCCESS(request, "Auction added to Watchlist Successfully!")
-        # return HttpResponseRedirect(reverse("watchlist"))
+        try:
+            auction = AuctionListing.objects.get(pk=auction_id)
+        except AuctionListing.DoesNotExist:
+            messages.error(request, "Auction not found.")
+            return HttpResponseRedirect(reverse("index")) # Check for redirect
 
+        if Watchlist.objects.filter(user=user_id, auction=auction).exists():
+            messages.error(request, "Auction already in Watchlist.")
+            return HttpResponseRedirect(reverse("auction", args=(auction_id,)))
+        else:
+            watchlist = Watchlist(
+                auction = auction,
+                user = user_id
+            )
+            watchlist.save()
+            messages.success(request, "Auction added to Watchlist Successfully!")
+            return HttpResponseRedirect(reverse("watchlist"))
+    
+    watchlist = Watchlist.objects.filter(user=user_id)
     return render(request, "auctions/watchlist.html", {
         "watchlist": watchlist
     })
@@ -183,3 +224,31 @@ def categories(request):
     return render(request, "auctions/categories.html", {
         "categories": cat
     })
+
+@login_required(login_url="login")
+def comments(request, auction_id):
+    try:
+        auction = AuctionListing.objects.get(pk=auction_id)
+    except AuctionListing.DoesNotExist:
+        messages.error(request, "Auction not found.")
+        return HttpResponseRedirect(reverse("index"))
+    
+    if request.method == "POST":
+        form = CreateComment(request.POST)
+        print("for now everythibng is working")
+        if form.is_valid():
+            body = form.cleaned_data["body"]
+            user = User.objects.get(pk=request.user.id)
+            print(f"This is the body: {body} made from {user}")
+
+            comment = Comment(
+                auction = auction,
+                user = user,
+                body = body
+            )
+            comment.save()
+            messages.success(request, "Comment added successfully!")
+        else:
+            messages.error(request, "Invalid comment")
+
+    return HttpResponseRedirect(reverse("auction", args=(auction_id,)))

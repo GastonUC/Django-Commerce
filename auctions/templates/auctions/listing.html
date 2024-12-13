@@ -21,24 +21,46 @@
             {{ auction.description }}
         </div>
     </article>
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated and auction.state == False %}
         {% if user == auction.user %}
             <input type="submit" value="Close Auction">
         {% else %}
-        <form action="{% url 'auction' auction.id %}" method="post">
-            {% csrf_token %}
-            {{ bid.bid }}
-            <input type="submit" value="Bid"><br>
+            <form action="{% url 'auction' auction.id %}" method="post">
+                {% csrf_token %}
+                {{ bid.bid }}
+                <input type="submit" value="Bid"><br>
+            </form>
             {% if not watchlist %}
-            <button>Add to Watchlist</button>
+            <form action="{% url 'watchlist' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="auction_id" value="{{ auction.id}}">
+                <input type="submit" value="Add to Watchlist">
+            </form>
             {% else %}
-            <button>Remove from watchlist</button>
+            <form action="{% url 'watchlist' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="auction_id" value="{{ auction.id}}">
+                <input type="submit" value="Remove from Watchlist">
+            </form>
             {% endif %}
-        </form>
         {% endif %}
-        <!-- <input type="number" name="bid" placeholder="Bid for the item"> -->
     {% endif %}
 
+</section>
+<section>
+    <article>
+        <h3>Comments</h3>
+        <ul>
+            {% for comment in comments %}
+                <li>{{ comment.user }}: {{ comment.body }} at {{ comment.date }}</li>
+            {% endfor %}
+        </ul>
+        <form action="{% url 'comment' auction.id %}" method="post">
+            {% csrf_token %}
+            {{ comment_form }} <br>
+            <input type="submit" value="Comment">
+        </form>
+    </article>
 </section>
 
 {% endblock %}

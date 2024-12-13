@@ -49,5 +49,8 @@ class Watchlist(models.Model):
     auction = models.ForeignKey(AuctionListing, on_delete=models.CASCADE) #Add ManyToManyField
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="watchlist_user") #Add ManyToManyField
 
+    class Meta:
+        unique_together = ['auction', 'user']
+
     def __str__(self):
         return f"{self.auction} on user {self.user} watchlist"
