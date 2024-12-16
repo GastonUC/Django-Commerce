@@ -8,23 +8,26 @@ class User(AbstractUser):
 class Category(models.Model): # Optional for the user
     name = models.CharField(max_length=20, blank=True)
 
+    class meta:
+        verbose_name_singular = "Category"
+        verbose_name_plural = "Categories" # trying to change the name of the table
+
     def __str__(self):
         return self.name
 
 class AuctionListing(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="users")
     title = models.CharField(max_length=45) #or 50
-    description = models.CharField(max_length=250)
+    description = models.TextField(max_length=450)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, related_name="category")
-    price = models.DecimalField(max_digits=9, decimal_places=2)
-    # price = models.ForeignKey('Bid', on_delete=models.CASCADE, related_name="price")
+    price = models.DecimalField(max_digits=9, decimal_places=2, default=1)
     date = models.DateTimeField(auto_now_add=True)
-    img_url = models.URLField(blank=True) # Check
+    img_url = models.URLField(blank=True, default="https://placeholder.pics/svg/300/FBFFBC-C7FF63/000000-9BA6FF/example%20image") # Check
     state = models.BooleanField(default=False)
 
     def __str__(self):
         # return f"{self.id} {self.title} {self.description} {self.price} {self.category} {self.date} {self.img_url}"
-        return f"ID: {self.id} Title: {self.title}"
+        return f"{self.id}, {self.state}"
 
 class Bid(models.Model):
     auction = models.ForeignKey(AuctionListing, on_delete=models.CASCADE)
@@ -53,4 +56,4 @@ class Watchlist(models.Model):
         unique_together = ['auction', 'user']
 
     def __str__(self):
-        return f"{self.auction} on user {self.user} watchlist"
+        return f"{self.auction}"

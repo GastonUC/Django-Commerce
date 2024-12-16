@@ -12,7 +12,7 @@ class BidAdmin(admin.ModelAdmin):
     list_display = ("id", "auction", "amount", "user", "bid_date")
 
 class WatchlistAdmin(admin.ModelAdmin):
-    list_display = ("auction", "user")
+    list_display = ("id", "auction", "user")
 
 class CommentAdmin(admin.ModelAdmin):
     list_display = ("id", "auction", "body", "user", "date")

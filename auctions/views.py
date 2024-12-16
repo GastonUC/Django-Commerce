@@ -12,22 +12,22 @@ from .models import User, Category, AuctionListing, Watchlist, Bid, Comment
 
 
 class CreateListing(forms.Form):
-    title = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Title for the Listing'}))
-    description = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Description'})) # initial="Title for the Listing"
+    title = forms.CharField(max_length=45, widget=forms.TextInput(attrs={'placeholder': 'Title, MAX 45 Characters'}))
+    description = forms.CharField(max_length=250, widget=forms.Textarea(attrs={'placeholder': 'Description'})) # initial="Title for the Listing"
     # category = forms.Select()
     # bid = forms.DecimalField(max_value=1000000, decimal_places=2, initial=0)
     img_url = forms.URLField(widget=forms.URLInput(attrs={'placeholder': 'https://www.imgur.com'}))
 
 class CreateBid(forms.Form):
-    bid = forms.DecimalField(max_value=1000000, decimal_places=2, initial=0, widget=forms.NumberInput(attrs={'placeholder':'Place your bid', 'tabindex':'0'}))
+    bid = forms.DecimalField(max_value=1000000, decimal_places=2, widget=forms.NumberInput(attrs={'placeholder':'Set the price', 'tabindex':'0'})) # initial=0, whitout this the form shows the placeholder
 
 class CreateComment(forms.Form):
-    body = forms.CharField(label="", max_length=250, widget=forms.Textarea(attrs={'placeholder':'Enter your comment...'}))
+    body = forms.CharField(label="", max_length=450, widget=forms.Textarea(attrs={'placeholder':'Enter your comment...'}))
 
 def index(request):
     # auctions = AuctionListing.objects.all()
     return render(request, "auctions/index.html", {
-        "Auctions": AuctionListing.objects.all()
+        "auctions": AuctionListing.objects.all()
     })
 
 
@@ -201,17 +201,25 @@ def watchlist(request):
             messages.error(request, "Auction not found.")
             return HttpResponseRedirect(reverse("index")) # Check for redirect
 
-        if Watchlist.objects.filter(user=user_id, auction=auction).exists():
-            messages.error(request, "Auction already in Watchlist.")
+        # if Watchlist.objects.filter(user=user_id, auction=auction).exists():
+        #     messages.error(request, "Auction already in Watchlist.")
+        #     return HttpResponseRedirect(reverse("auction", args=(auction_id,)))
+        # else:
+        if request.POST.get("state_watchlist") == "True": # Check for this logic, maybe there is a better way
+            watchlist_item = Watchlist.objects.filter(
+                user=user_id, auction=auction
+                )
+            watchlist_item.delete()
+            messages.success(request, "Auction removed from Watchlist Successfully!")
             return HttpResponseRedirect(reverse("auction", args=(auction_id,)))
         else:
-            watchlist = Watchlist(
+            watchlist_item = Watchlist(
                 auction = auction,
                 user = user_id
             )
-            watchlist.save()
+            watchlist_item.save()
             messages.success(request, "Auction added to Watchlist Successfully!")
-            return HttpResponseRedirect(reverse("watchlist"))
+            return HttpResponseRedirect(reverse("auction", args=(auction_id,)))
     
     watchlist = Watchlist.objects.filter(user=user_id)
     return render(request, "auctions/watchlist.html", {
@@ -219,8 +227,26 @@ def watchlist(request):
     })
 
 
-def categories(request):
+def categories(request, category=None):
     cat = Category.objects.all()
+    if category:
+        if Category.objects.filter(name=category).exists():
+            category_obj = Category.objects.get(name=category)
+            auctions = AuctionListing.objects.filter(category=category_obj)
+        else:
+            # messages.error(request, "Category not found.")
+            # return render(request, "auctions/categories.html", {
+            #     "categories": cat
+            # }) 
+            messages.error(request, "Category not found.")
+            auctions = []
+            category_obj = None
+
+        return render(request, "auctions/categories.html", {
+            "auctions": auctions,
+            "categories": cat,
+            "selected_category": category_obj
+        })
     return render(request, "auctions/categories.html", {
         "categories": cat
     })

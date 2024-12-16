@@ -1,63 +1,29 @@
 {% extends "auctions/layout.html" %}
 {% block body %}
-This is categories
-    <ul>
-    {% for cat in categories %}
-        <li>{{ cat }}</li>
-    {% endfor %}
-    </ul>
+    {% if messages %}
+        {% for message in messages %}
+            <h3>{{ message }}</h3>
+        {% endfor %}
+    {% endif %}
+    This is categories
+        <ul>
+        {% for cat in categories %} <!-- Maybe before the ul tag, can add a logic to detect when it is displaying all the auctions for a category and wrap the categories on some nav bar  -->
+            <li><a href="{% url 'categories' cat.name %}">{{ cat }}</a></li>
+        {% endfor %}
+        </ul>
+        {% if selected_category %}
+            <h3>Auctions in {{ selected_category.name }}</h3>
+            <ul>
+                {% for auction in auctions %}
+                    <li><a href="{% url 'auction' auction.id %}"> {{ auction.title }} - {{ auction.description }} - {{ auction.price }} </a></a></li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Select a category to view auctions.</p>
+        {% endif %}
 {% endblock %}
 
 <!--
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuctionHub - Categories</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .category-card {
-            transition: transform 0.3s ease-in-out;
-        }
-        .category-card:hover {
-            transform: translateY(-5px);
-        }
-    </style>
-</head>
-<body>
-    <header class="bg-light shadow-sm">
-        <nav class="navbar navbar-expand-lg navbar-light container">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="index.html">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-bag" viewBox="0 0 16 16">
-                        <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"/>
-                    </svg>
-                    <span class="ms-2 fw-bold">AuctionHub</span>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="index.html">Active Listings</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="create-listing.html">Create Listing</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="watchlist.html">Watchlist</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="categories.html">Categories</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-
     <main class="container my-5">
         <h1 class="mb-4">Browse Categories</h1>
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
