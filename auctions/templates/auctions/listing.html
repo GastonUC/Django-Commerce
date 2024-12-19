@@ -23,7 +23,11 @@
     </article>
     {% if user.is_authenticated and auction.state == False %}
         {% if user == auction.user %}
+        <form action="{% url 'auction' auction.id %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="state_auction" value="True">
             <input type="submit" value="Close Auction">
+        </form>
         {% else %}
             <form action="{% url 'auction' auction.id %}" method="post">
                 {% csrf_token %}

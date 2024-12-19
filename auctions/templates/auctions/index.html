@@ -1,7 +1,6 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
     {% if messages %}
         <div>
             {% for message in messages %}
@@ -9,87 +8,32 @@
             {% endfor %}
         </div>
     {% endif %}
-    {% if auctions %}
-        {% for auction in auctions %}
-            {% if auction.state == False %}
-            <div>
-                Auction {{ auction.id }} <br>
-                <div><a href="{% url 'auction' auction.id %}"><strong>Title:</strong> {{ auction.title }}</a></div>
-                <div><strong>Price:</strong> ${{ auction.price }}</div>
-                <div><strong>Category:</strong> {{ auction.category }}</div>
-                <div><strong>Description:</strong> {{ auction.description }}</div>
-            </div> <br>
-            {% endif %}
-        {% endfor %}
-    {% else %}
-        No auctions
-    {% endif %}
-{% endblock %}
-
-<!--
     <main class="container my-5">
         <h1 class="mb-4">Active Listings</h1>
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
-            <div class="col">
-                <div class="card h-100 auction-card">
-                    <img src="/placeholder.svg?height=200&width=300" class="card-img-top" alt="Vintage Watch">
-                    <div class="card-body">
-                        <h5 class="card-title">Vintage Watch</h5>
-                        <p class="card-text">A beautiful vintage watch from the 1950s</p>
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="text-success fw-bold">$150</span>
-                            <span class="text-muted"><small>2 hours left</small></span>
+            {% if auctions %}
+                {% for auction in auctions %}
+                    {% if not auction.state %}
+                        <div class="col">
+                            <div class="card h-100 auction-card">
+                                <img src="{{ auction.img_url }}" class="card-img-top" alt="{{ auction.title }}" height="250px" width="300px">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ auction.title }}</h5>
+                                    <p class="card-text">{{ auction.description }}</p>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="text-success fw-bold">${{ auction.price }}</span>
+                                        <!-- <span class="text-muted"><small>2 hours left</small></span> -->
+                                    </div>
+                                    <a href="{% url 'auction' auction.id %}" class="btn btn-primary w-100">View Listing</a>
+                                </div>
+                            </div>
                         </div>
-                        <a href="listing-page.html?id=1" class="btn btn-primary w-100">View Listing</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card h-100 auction-card">
-                    <img src="/placeholder.svg?height=200&width=300" class="card-img-top" alt="Modern Art Painting">
-                    <div class="card-body">
-                        <h5 class="card-title">Modern Art Painting</h5>
-                        <p class="card-text">Original abstract painting by emerging artist</p>
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="text-success fw-bold">$500</span>
-                            <span class="text-muted"><small>1 day left</small></span>
-                        </div>
-                        <a href="listing-page.html?id=2" class="btn btn-primary w-100">View Listing</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card h-100 auction-card">
-                    <img src="/placeholder.svg?height=200&width=300" class="card-img-top" alt="Antique Furniture">
-                    <div class="card-body">
-                        <h5 class="card-title">Antique Furniture</h5>
-                        <p class="card-text">Elegant 19th century mahogany dresser</p>
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="text-success fw-bold">$300</span>
-                            <span class="text-muted"><small>5 hours left</small></span>
-                        </div>
-                        <a href="listing-page.html?id=3" class="btn btn-primary w-100">View Listing</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card h-100 auction-card">
-                    <img src="/placeholder.svg?height=200&width=300" class="card-img-top" alt="Rare Book Collection">
-                    <div class="card-body">
-                        <h5 class="card-title">Rare Book Collection</h5>
-                        <p class="card-text">Set of first edition classic novels</p>
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="text-success fw-bold">$1000</span>
-                            <span class="text-muted"><small>3 days left</small></span>
-                        </div>
-                        <a href="listing-page.html?id=4" class="btn btn-primary w-100">View Listing</a>
-                    </div>
-                </div>
-            </div>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                No Auctions
+            {% endif %}
         </div>
     </main>
+{% endblock %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
--->

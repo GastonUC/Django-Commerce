@@ -1,46 +1,35 @@
 {% extends "auctions/layout.html" %}
 {% block body %}
-Here is where you can create Listings <br>
-
-<form action="{% url 'new_listing' %}" method="post">
-    {% csrf_token %}
-    {{ form.title }} <br>
-    {{ form.description }} <br>
-    {{ bid.bid }} <br> <!-- added '.bid' because in this way, the label disappears-->
-    <h5>Optionals</h3>
-    <select name="category" id="">
-        <option value="" selected>Select a Category</option>
-        {% for category in categories %}
-            <option value="{{ category.id }}">
-                {{ category.name }}
-            </option>
-        {% endfor %}
-    </select> <br>
-    {{ form.img_url }} <br>
-    <hr>
-    <input type="submit" value="Create Listing">
-</form>
-
-{% endblock %}
-
-<!--
     <main class="container my-5">
         <h1 class="mb-4">Create New Listing</h1>
-        <form>
+        <form action="{% url 'new_listing' %}" method="post">
+            {% csrf_token %}
             <div class="mb-3">
-                <label for="title" class="form-label">Title</label>
-                <input type="text" class="form-control" id="title" required>
+                {{ form.title }}
+                <!-- <label for="title" class="form-label">Title</label> -->
+                <!-- <input type="text" class="form-control" id="title" required> -->
             </div>
             <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
-                <textarea class="form-control" id="description" rows="3" required></textarea>
+                {{ form.description }}
+                <!-- <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" rows="3" required></textarea> -->
             </div>
             <div class="mb-3">
-                <label for="startingBid" class="form-label">Starting Bid ($)</label>
-                <input type="number" class="form-control" id="startingBid" min="0" step="0.01" required>
+                {{ bid.bid }}
+                <!-- <label for="startingBid" class="form-label">Starting Bid ($)</label>
+                <input type="number" class="form-control" id="startingBid" min="0" step="0.01" required> -->
             </div>
+            <h5>Optionals</h5><hr>
             <div class="mb-3">
-                <label for="category" class="form-label">Category</label>
+                <select class="form-select" name="category" id="">
+                    <option value="" selected>Select a Category</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <!-- <label for="category" class="form-label">Category</label>
                 <select class="form-select" id="category" required>
                     <option value="">Select a category</option>
                     <option value="electronics">Electronics</option>
@@ -48,20 +37,21 @@ Here is where you can create Listings <br>
                     <option value="home">Home & Garden</option>
                     <option value="collectibles">Collectibles</option>
                     <option value="other">Other</option>
-                </select>
+                </select> -->
             </div>
-            <div class="mb-3">
+            <!-- <div class="mb-3">
                 <label for="endDate" class="form-label">Auction End Date</label>
                 <input type="datetime-local" class="form-control" id="endDate" required>
-            </div>
+            </div> -->
             <div class="mb-3">
-                <label for="image" class="form-label">Upload Image</label>
-                <input type="file" class="form-control" id="image" accept="image/*" required>
+                {{  form.img_url }}
+                <!-- <label for="image" class="form-label">Upload Image</label>
+                <input type="file" class="form-control" id="image" accept="image/*" required> -->
             </div>
             <button type="submit" class="btn btn-primary">Create Listing</button>
         </form>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+{% endblock %}
 
--->

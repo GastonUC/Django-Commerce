@@ -12,20 +12,19 @@ from .models import User, Category, AuctionListing, Watchlist, Bid, Comment
 
 
 class CreateListing(forms.Form):
-    title = forms.CharField(max_length=45, widget=forms.TextInput(attrs={'placeholder': 'Title, MAX 45 Characters'}))
-    description = forms.CharField(max_length=250, widget=forms.Textarea(attrs={'placeholder': 'Description'})) # initial="Title for the Listing"
-    # category = forms.Select()
-    # bid = forms.DecimalField(max_value=1000000, decimal_places=2, initial=0)
-    img_url = forms.URLField(widget=forms.URLInput(attrs={'placeholder': 'https://www.imgur.com'}))
+    title = forms.CharField(max_length=45, widget=forms.TextInput(attrs={'placeholder': 'Title, MAX 45 Characters', 'class': 'form-control'}))
+    description = forms.CharField(max_length=250, widget=forms.Textarea(attrs={'placeholder': 'Description', 'class': 'form-control'}))
+    img_url = forms.URLField(required=False, widget=forms.URLInput(attrs={'placeholder': 'https://www.imgur.com/myImage','class': 'form-control'}))
 
 class CreateBid(forms.Form):
-    bid = forms.DecimalField(max_value=1000000, decimal_places=2, widget=forms.NumberInput(attrs={'placeholder':'Set the price', 'tabindex':'0'})) # initial=0, whitout this the form shows the placeholder
+    bid = forms.DecimalField(max_value=1000000, decimal_places=2, widget=forms.NumberInput(attrs={'placeholder':'Set the price','class': 'form-control', 'tabindex':'0'})) # initial=0, whitout this the form shows the placeholder
 
 class CreateComment(forms.Form):
     body = forms.CharField(label="", max_length=450, widget=forms.Textarea(attrs={'placeholder':'Enter your comment...'}))
 
 def index(request):
     # auctions = AuctionListing.objects.all()
+    # print(CreateListing())
     return render(request, "auctions/index.html", {
         "auctions": AuctionListing.objects.all()
     })
@@ -94,49 +93,57 @@ def auction(request, auction_id):
     highest_bid = Bid.objects.filter(auction=auction_id).order_by("-amount").first()
     # print(bid_count, highest_bid)
 
+    comments = Comment.objects.filter(auction=auction_id)
+
     if auction.state:
         if bid_count < 1:
             messages.error(request, "This auction has ended without any bids")
         else:
-            messages.success(request, f"This auction has ended with a winning bid of {highest_bid}")
+            if (highest_bid.user.id == request.user.id):
+                messages.success(request, f"Congratulations! You have the highest bid of {highest_bid}")
+            else:
+                messages.success(request, f"This auction has ended with a winning bid of {highest_bid}")
             watchlist = False
     else:
         if request.user.is_authenticated:
-            watchlist_item = Watchlist.objects.filter(user=request.user.id, auction=auction)
-            watchlist = watchlist_item.exists()
+            watchlist = Watchlist.objects.filter(user=request.user.id, auction=auction).exists()
         else:
             watchlist = False
 
-    comments = Comment.objects.filter(auction=auction_id)
-
     if highest_bid is not None:
-        if highest_bid.user == request.user.id:
+        if highest_bid.user.id == request.user.id:
             messages.success(request, "You have the highest bid on this auction")
         else:
             messages.info(request, f"The highest bid on this auction is from {highest_bid.user}")
 
     if request.method == "POST":
-        form = CreateBid(request.POST)
-        if form.is_valid():
-            user_bid = float(form.cleaned_data["bid"])
-            actual_bid = auction.price
-            if user_bid <= actual_bid:
-                messages.error(request, "Sorry, but your bid must be above the present one")
-                # raise ValidationError("Sorry, but your bid must be above the present one") # This will only display the validationError mesasge at the top of the page when Developer mode is active
-                # return HttpResponseRedirect(reverse("auction", args=(auction_id,)))
-            else:
-                bid = Bid(
-                    auction = auction,
-                    amount = user_bid,
-                    user = User.objects.get(pk=request.user.id)
-                )
-                bid.save()
+        if request.POST.get("state_auction") == "True":
+            auction.state = True
+            auction.save()
+            messages.success(request, "Auction ended successfully!")
+            return HttpResponseRedirect(reverse("auction", args=(auction_id,)))
+        else:
+            form = CreateBid(request.POST)
+            if form.is_valid():
+                user_bid = float(form.cleaned_data["bid"])
+                actual_bid = auction.price
+                if user_bid <= actual_bid:
+                    messages.error(request, "Sorry, but your bid must be above the present one")
+                    # raise ValidationError("Sorry, but your bid must be above the present one") # This will only display the validationError mesasge at the top of the page when Developer mode is active
+                    # return HttpResponseRedirect(reverse("auction", args=(auction_id,)))
+                else:
+                    bid = Bid(
+                        auction = auction,
+                        amount = user_bid,
+                        user = User.objects.get(pk=request.user.id)
+                    )
+                    bid.save()
 
-                # Update the auctions's price
-                auction.price = bid.amount
-                auction.save()
-                print("Bid saved")
-                # auction.price.save()
+                    # Update the auctions's price
+                    auction.price = bid.amount
+                    auction.save()
+                    print("Bid saved")
+                    # auction.price.save()
 
     return render(request, "auctions/listing.html", {
         "auction": auction,
@@ -155,7 +162,8 @@ def new_listing(request):
         if form.is_valid() and bidForm.is_valid():
             title = form.cleaned_data["title"]
             description = form.cleaned_data["description"]
-            category = Category.objects.get(pk=int(request.POST["category"]))
+            category_id = request.POST["category"]
+            category = Category.objects.get(pk=int(category_id)) if category_id else None
             # price = form.cleaned_data["bid"]
             price = bidForm.cleaned_data["bid"]
             img_url = form.cleaned_data["img_url"]

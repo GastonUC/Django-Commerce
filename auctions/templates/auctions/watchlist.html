@@ -5,7 +5,7 @@
     {% else %}
         <ul>
             {% for item in watchlist %}
-                <li><a href="{% url 'auction' item %}">{{ item.auction.title }} {{ item.auction.description }}</a></li>
+                <li><a href="{% url 'auction' item.auction.id %}">{{ item.auction.title }} {{ item.auction.description }}</a></li>
             {% endfor %}
         </ul>
     {% endif %}
