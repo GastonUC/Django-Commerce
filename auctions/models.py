@@ -7,6 +7,8 @@ class User(AbstractUser):
 
 class Category(models.Model): # Optional for the user
     name = models.CharField(max_length=20, blank=True)
+    description = models.TextField(max_length=100, default="Explore this category!")
+    img = models.URLField(default="https://placeholder.pics/svg/300/FBFFBC-C7FF63/000000-9BA6FF/example%20image")
 
     class meta:
         verbose_name_singular = "Category"

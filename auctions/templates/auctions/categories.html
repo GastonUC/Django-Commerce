@@ -5,92 +5,43 @@
             <h3>{{ message }}</h3>
         {% endfor %}
     {% endif %}
-    This is categories
-        <ul>
-        {% for cat in categories %} <!-- Maybe before the ul tag, can add a logic to detect when it is displaying all the auctions for a category and wrap the categories on some nav bar  -->
-            <li><a href="{% url 'categories' cat.name %}">{{ cat }}</a></li>
-        {% endfor %}
-        </ul>
-        {% if selected_category %}
-            <h3>Auctions in {{ selected_category.name }}</h3>
-            <ul>
-                {% for auction in auctions %}
-                    <li><a href="{% url 'auction' auction.id %}"> {{ auction.title }} - {{ auction.description }} - {{ auction.price }} </a></a></li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>Select a category to view auctions.</p>
-        {% endif %}
-{% endblock %}
-
-<!--
+<!-- Maybe before the ul tag, can add a logic to detect when it is displaying all the auctions for a category and wrap the categories on some nav bar  -->
     <main class="container my-5">
-        <h1 class="mb-4">Browse Categories</h1>
+        {% if selected_category %}
+        <h1 class="mb-4">Auction in {{ selected_category.name }}</h1>
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            <div class="col">
-                <div class="card h-100 category-card">
-                    <img src="/placeholder.svg?height=200&width=300" class="card-img-top" alt="Electronics">
-                    <div class="card-body">
-                        <h5 class="card-title">Electronics</h5>
-                        <p class="card-text">Explore the latest gadgets and tech items</p>
-                        <a href="#" class="btn btn-primary">View Electronics</a>
+            {% for auction in auctions %}
+                <div class="col">
+                    <div class="card h-100 category-card">
+                        <img src="{{ auction.img_url }}?height=400&width=600" class="card-img-top" alt="{{ auction.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ auction.title }}</h5>
+                            <p class="card-text">{{ auction.description }}</p>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-success fw-bold">${{ auction.price }}</span>
+                            </div>
+                            <a href="{% url 'auction' auction.id %}" class="btn btn-primary w-100">View Listing</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col">
-                <div class="card h-100 category-card">
-                    <img src="/placeholder.svg?height=200&width=300" class="card-img-top" alt="Fashion">
-                    <div class="card-body">
-                        <h5 class="card-title">Fashion</h5>
-                        <p class="card-text">Discover trendy clothing and accessories</p>
-                        <a href="#" class="btn btn-primary">View Fashion</a>
+            {% endfor %}
+            {% else %}
+            <h1 class="mb-4">Browse Categories</h1>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for item in categories %}
+                <div class="col">
+                    <div class="card h-100 category-card">
+                        <img src="{{ item.img }}?height=200&width=300" class="card-img-top" alt="{{ item.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ item.name }}</h5>
+                            <p class="card-text">{{ item.description }}</p>
+                            <a href="{% url 'categories' item.name %}" class="btn btn-primary">View {{ item.name }}</a>
+                        </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
-            <div class="col">
-                <div class="card h-100 category-card">
-                    <img src="/placeholder.svg?height=200&width=300" class="card-img-top" alt="Home & Garden">
-                    <div class="card-body">
-                        <h5 class="card-title">Home & Garden</h5>
-                        <p class="card-text">Find items to beautify your living space</p>
-                        <a href="#" class="btn btn-primary">View Home & Garden</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card h-100 category-card">
-                    <img src="/placeholder.svg?height=200&width=300" class="card-img-top" alt="Collectibles">
-                    <div class="card-body">
-                        <h5 class="card-title">Collectibles</h5>
-                        <p class="card-text">Browse rare and unique collectible items</p>
-                        <a href="#" class="btn btn-primary">View Collectibles</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card h-100 category-card">
-                    <img src="/placeholder.svg?height=200&width=300" class="card-img-top" alt="Sports & Outdoors">
-                    <div class="card-body">
-                        <h5 class="card-title">Sports & Outdoors</h5>
-                        <p class="card-text">Get equipment for your favorite activities</p>
-                        <a href="#" class="btn btn-primary">View Sports & Outdoors</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card h-100 category-card">
-                    <img src="/placeholder.svg?height=200&width=300" class="card-img-top" alt="Art">
-                    <div class="card-body">
-                        <h5 class="card-title">Art</h5>
-                        <p class="card-text">Explore paintings, sculptures, and more</p>
-                        <a href="#" class="btn btn-primary">View Art</a>
-                    </div>
-                </div>
-            </div>
+            {% endif %}
         </div>
     </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
--->
+{% endblock %}

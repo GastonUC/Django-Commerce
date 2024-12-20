@@ -12,7 +12,7 @@ from .models import User, Category, AuctionListing, Watchlist, Bid, Comment
 
 
 class CreateListing(forms.Form):
-    title = forms.CharField(max_length=45, widget=forms.TextInput(attrs={'placeholder': 'Title, MAX 45 Characters', 'class': 'form-control'}))
+    title = forms.CharField(max_length=45, widget=forms.TextInput(attrs={'placeholder': 'Title', 'class': 'form-control'}))
     description = forms.CharField(max_length=250, widget=forms.Textarea(attrs={'placeholder': 'Description', 'class': 'form-control'}))
     img_url = forms.URLField(required=False, widget=forms.URLInput(attrs={'placeholder': 'https://www.imgur.com/myImage','class': 'form-control'}))
 
@@ -20,7 +20,7 @@ class CreateBid(forms.Form):
     bid = forms.DecimalField(max_value=1000000, decimal_places=2, widget=forms.NumberInput(attrs={'placeholder':'Set the price','class': 'form-control', 'tabindex':'0'})) # initial=0, whitout this the form shows the placeholder
 
 class CreateComment(forms.Form):
-    body = forms.CharField(label="", max_length=450, widget=forms.Textarea(attrs={'placeholder':'Enter your comment...'}))
+    body = forms.CharField(label="", max_length=450, widget=forms.Textarea(attrs={'placeholder':'Enter your comment...','class':'form-control'}))
 
 def index(request):
     # auctions = AuctionListing.objects.all()
@@ -91,7 +91,6 @@ def auction(request, auction_id):
 
     bid_count = Bid.objects.filter(auction=auction_id).count()
     highest_bid = Bid.objects.filter(auction=auction_id).order_by("-amount").first()
-    # print(bid_count, highest_bid)
 
     comments = Comment.objects.filter(auction=auction_id)
 
@@ -109,12 +108,6 @@ def auction(request, auction_id):
             watchlist = Watchlist.objects.filter(user=request.user.id, auction=auction).exists()
         else:
             watchlist = False
-
-    if highest_bid is not None:
-        if highest_bid.user.id == request.user.id:
-            messages.success(request, "You have the highest bid on this auction")
-        else:
-            messages.info(request, f"The highest bid on this auction is from {highest_bid.user}")
 
     if request.method == "POST":
         if request.POST.get("state_auction") == "True":
