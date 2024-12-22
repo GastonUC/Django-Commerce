@@ -1,10 +1,5 @@
 {% extends "auctions/layout.html" %}
 {% block body %}
-    {% if messages %}
-        {% for message in messages %}
-            <h3>{{ message }}</h3>
-        {% endfor %}
-    {% endif %}
 <!-- Maybe before the ul tag, can add a logic to detect when it is displaying all the auctions for a category and wrap the categories on some nav bar  -->
     <main class="container my-5">
         {% if selected_category %}

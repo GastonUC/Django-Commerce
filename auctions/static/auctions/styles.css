@@ -17,3 +17,8 @@ textarea {
 .alert {
     margin-bottom: 10px;
 }
+
+div.comment-date {
+    font-size: 0.9em;
+    margin-top: 5px;
+}
