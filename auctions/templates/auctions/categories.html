@@ -8,7 +8,7 @@
             {% for auction in auctions %}
                 <div class="col">
                     <div class="card h-100 category-card">
-                        <img src="{{ auction.img_url }}?height=400&width=600" class="card-img-top" alt="{{ auction.name }}">
+                        <img src="{{ auction.img_url }}" class="card-img-top" alt="{{ auction.name }}" height="250px" width="300px">
                         <div class="card-body">
                             <h5 class="card-title">{{ auction.title }}</h5>
                             <p class="card-text">{{ auction.description }}</p>
@@ -26,7 +26,7 @@
                 {% for item in categories %}
                 <div class="col">
                     <div class="card h-100 category-card">
-                        <img src="{{ item.img }}?height=200&width=300" class="card-img-top" alt="{{ item.name }}">
+                        <img src="{{ item.img }}" class="card-img-top" alt="{{ item.name }}" height="250px" width="300px">
                         <div class="card-body">
                             <h5 class="card-title">{{ item.name }}</h5>
                             <p class="card-text">{{ item.description }}</p>

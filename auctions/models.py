@@ -24,7 +24,7 @@ class AuctionListing(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, null=True, related_name="category")
     price = models.DecimalField(max_digits=9, decimal_places=2, default=1)
     date = models.DateTimeField(auto_now_add=True)
-    img_url = models.URLField(default="https://placeholder.pics/svg/300/FBFFBC-C7FF63/000000-9BA6FF/example%20image") # Check
+    img_url = models.URLField(default="http://placeholder.pics/svg/600x400/DEDEDE/555555/example%20image") # Check
     state = models.BooleanField(default=False)
 
     def __str__(self):
