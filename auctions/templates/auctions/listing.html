@@ -41,7 +41,7 @@
                     {% if not watchlist %}
                     <form action="{% url 'watchlist' %}" method="post">
                         {% csrf_token %}
-                        <input type="hidden" name="auction_id" value="{{ auction.id}}">
+                        <input type="hidden" name="auction_id" value="{{ auction.id }}">
                         <input type="hidden" name="state_watchlist" value="False">
                         <!-- <input type="submit" value="Add to Watchlist"> -->
                         <button id="watchlistBtn" class="btn btn-outline-secondary" type="submit"> <!--Maybe without submit-->

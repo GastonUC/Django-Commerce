@@ -180,7 +180,7 @@ def watchlist(request):
 
     if request.method == "POST":
         auction_id = request.POST["auction_id"]
-        auction = get_object_or_404(AuctionListing, auction=auction_id)
+        auction = get_object_or_404(AuctionListing, id=auction_id)
 
         if request.POST.get("state_watchlist") == "True":
             Watchlist.objects.filter(user=user_id, auction=auction).delete()
